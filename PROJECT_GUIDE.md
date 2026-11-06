@@ -523,3 +523,14 @@ Firebase Console → Auth (add user) → Firestore `adminProfiles/{uid}` with ro
 - Toast notifications replaced with professional centered popup dialogs (admin panel).
 - Admin login page redesigned (centered card, focus rings, loading state).
 - Admin shell: sidebar flex column, aligned topbar/content, responsive tables.
+
+
+## Latest updates
+- Admin dashboard now shows an APK download counter (manual, set in Settings).
+- Admin panel fonts (Plus Jakarta Sans, Hind Siliguri) are now self-hosted (copied from website).
+- Theme toggle moved to the right side of the header (website + admin).
+- Toast notifications replaced with professional centered popup dialogs (admin).
+
+
+## Screenshots
+Real app screenshots (7 JPEGs) are in `website/public/assets/screenshots/` and displayed in a gallery on the home page (`index.html`). Filenames: 01-home-dashboard, 02-add-water, 03-analytics, 04-achievements, 05-settings, 06-settings, 07-authentication.
