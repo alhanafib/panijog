@@ -15,7 +15,7 @@ Panijog is an Android hydration-tracking app plus a static marketing website.
 - **App:** native Android, Kotlin + Jetpack Compose, Room, Hilt, Firebase Auth +
   Firestore, Firebase App Check. Package `com.hanafi.panijog.hytdrk`.
   Version **1.0** (version code 1), released **6 November 2026**, minSdk 24
-  (Android 7.0+), APK 30,680,837 bytes (29.3 MiB).
+  (Android 7.0+), APK 30,351,362 bytes (28.9 MiB).
 - **Website:** static HTML/CSS/vanilla JS hosted on Firebase Hosting at
   `https://panijog.web.app/`. No framework, no build step, no third-party
   scripts or fonts.
@@ -255,13 +255,13 @@ allow `panijog.web.app` (and `localhost` for testing) as HTTP referrers.
 | Field | Value |
 | --- | --- |
 | File | `Panijog.apk` |
-| Size | 30,680,837 bytes (29.26 MiB / 30.68 MB) |
+| Size | 30,351,362 bytes (28.9 MiB / 30.4 MB) |
 | Version | 1.0 (version code 1) |
 | Package | `com.hanafi.panijog.hytdrk` |
 | Min Android | 7.0 (API 24) |
 | Release date | 6 November 2026 |
-| Download URL | `https://panijog.web.app/Panijog.apk` |
-| SHA-256 | `19F2352FE03D1696BBF87C56A5A70D8084A622F511C5710D521F1471AB9F2198` |
+| Download URL | `https://github.com/alhanafib/panijog/releases/tag/android-app` |
+| SHA-256 | `401f029785a7fb0e7c4200c5393a1d694436a6a9d7431bf76dcac61af1b75136` |
 
 If a new APK replaces it, update version, size, date, and SHA-256 on
 `download.html`, `changelog.html`, `about.html`, and `README.md`.
@@ -368,3 +368,158 @@ Do not delete `Panijog.apk`, `cat-computer.gif`, fonts, or any page listed above
 ---
 
 *Last updated: 6 November 2026. Maintained alongside version 1.0.*
+
+
+---
+
+## Admin Panel
+
+A separate admin dashboard lives in `admin/`. It is a static site (HTML/CSS/JS)
+plus Firestore rules and indexes. It shares the same Firebase project but uses a
+separate Hosting site `panijog-admin-cp` (`panijog-admin-cp.web.app`).
+
+### Authorization model (no Cloud Functions / no Blaze)
+- Admin status = existence of `adminProfiles/{uid}` document.
+- Role read via `get()` in Firestore rules: SuperAdmin / Admin / Support / Analyst.
+- Privileged Auth-level actions (disable Firebase Auth user) require the Console
+  or a local Admin SDK script.
+- Audit logs are append-only.
+
+### Pages
+`login.html`, `dashboard.html`, `users.html`, `user-details.html`,
+`releases.html`, `campaigns.html`, `analytics.html`, `feedback.html`,
+`notifications.html`, `content.html`, `audit-logs.html`, `settings.html`,
+`admins.html`, `profile.html`, `403.html`, `404.html`.
+
+### Theme
+White / dark / system toggle (default system), persisted in localStorage.
+
+## Website updates (latest)
+
+- Google site verification meta tag added to all pages.
+- Theme toggle (white/dark/system) added to header.
+- Floating glass header.
+- GitHub repository + GitHub Releases download links added to download page and footer.
+- SHA-256 updated to `401f029785a7fb0e7c4200c5393a1d694436a6a9d7431bf76dcac61af1b75136`
+  (APK size 30,351,362 bytes / 28.9 MiB).
+- `public/` folder reorganization: deployable files in `website/public/`,
+  config/rules/docs outside.
+- Root leftover `firebase.json`, `.firebaserc`, `.firebase/` removed.
+- `license.html` page added; footer links to it.
+- Help center split into index + 6 article pages.
+
+## File organization rule
+- Website deployable files → `website/public/`.
+- Website config/rules/docs → `website/` (outside public).
+- Admin deployable files → `admin/public/`.
+- Admin config/rules/functions/docs → `admin/` (outside public).
+- App files → `doc/` / app project.
+
+
+---
+
+## Unified Firestore Rules (app + website + admin)
+
+As of the latest update, the **same unified rules file** is used for all three
+components (app, website, admin panel) because they share one Firebase project
+(`gen-lang-client-0297092818`). The canonical copy lives in three places (kept
+in sync):
+
+- `website/firebase/firestore.rules` (deployable via website firebase.json)
+- `admin/firestore.rules` (deployable via admin firebase.json)
+- `doc/firestore.rules` (reference copy, do not delete)
+
+The rules cover:
+- App: `users/{userId}`, `users/{userId}/intakes/{intakeId}` (owner-scoped).
+- Website: `contactMessages/{id}` (create-only, validated).
+- Admin: `adminProfiles`, `appConfig`, `releases`, `announcements`,
+  `feedback`, `supportCampaigns`, `analyticsAggregates`, `auditLogs`
+  (append-only), `deletionRequests`.
+- Admin authorization via `adminProfiles/{uid}` existence + role (no Cloud
+  Functions / no Blaze plan).
+
+### Google AI Studio files in doc/
+The following files were added from Google AI Studio and are kept as reference:
+- `doc/firebase-blueprint.json` — entity schema (UserProfile, IntakeRecord).
+- `doc/firebase.json` — points to a separate AI Studio database
+  (`ai-studio-android-panijog-...`); **not** the production database.
+  Do not overwrite the production `firebase.json` files with this.
+- `doc/README.md`, `doc/LICENSE` — copies for the doc folder.
+
+### Notes on the production database
+Production project: `gen-lang-client-0297092818`. Firestore region recommended:
+`asia-south1`. Hosting sites: `panijog` (website) and `panijog-admin-cp`
+(admin).
+
+
+---
+
+## Website Structure (public/ folder)
+
+Deployable files live in `website/public/`. Config/rules/docs stay in `website/`:
+
+```
+website/
+├── public/              <- Firebase Hosting public dir
+│   ├── index.html … license.html, 404.html
+│   ├── Panijog.apk, cat-computer.gif
+│   ├── robots.txt, sitemap.xml, site.webmanifest
+│   └── assets/ (css, js, fonts, img, screenshots)
+├── firebase/
+│   └── firestore.rules  <- unified (app + website + admin)
+├── firebase.json        (public = "public")
+├── .firebaserc
+└── README.md
+```
+
+## Website Features (latest additions)
+
+- **Theme toggle**: white / dark / system (default system), persisted in localStorage, in header.
+- **Floating glass header**: sticky rounded glass pill.
+- **Google site verification**: meta tag on all pages.
+- **GitHub links**: footer (all pages) + download page "Download from GitHub (recommended)" button.
+- **SHA-256**: `401f029785a7fb0e7c4200c5393a1d694436a6a9d7431bf76dcac61af1b75136` (APK 30,351,362 bytes / 28.9 MiB).
+- **License page**: `license.html`.
+- **Help center**: index + 6 article pages with pager.
+
+## Admin Panel
+
+Location: `admin/`. Static site + unified Firestore rules + indexes.
+
+- **Hosting site**: `panijog-admin-cp` → `panijog-admin-cp.web.app`.
+- **Auth**: Firebase Auth email/password; admin status = `adminProfiles/{uid}` existence.
+- **RBAC**: SuperAdmin / Admin / Support / Analyst via Firestore rules (no Cloud Functions).
+- **Theme**: white/dark/system toggle (default system).
+- **Pages**: login, dashboard, users, user-details, releases, campaigns, analytics, feedback, notifications, content, audit-logs, settings, admins, profile, 403, 404.
+- **UI**: floating glass header, sidebar, data tables, KPI cards, modals, toasts, skeleton/empty/error states, responsive 320–1440.
+
+### How to create a Super Admin
+1. Firebase Console → Authentication → Add user (email + password). Note the UID.
+2. Firestore → `adminProfiles` collection → document ID = UID → fields:
+   `role: "SuperAdmin"`, `status: "active"`, `permissions: ["*"]`,
+   `invitedBy: null`, `createdAt: serverTimestamp()`.
+3. Login at `panijog-admin-cp.web.app/login.html`.
+4. From Admins page, create other admin profiles (user must exist in Auth first).
+
+## Super Admin creation (summary)
+Firebase Console → Auth (add user) → Firestore `adminProfiles/{uid}` with role SuperAdmin/active → login.
+
+## File organization rule
+- Website deployable → `website/public/`.
+- Website config/rules/docs → `website/`.
+- Admin deployable → `admin/public/`.
+- Admin config/rules/docs → `admin/`.
+- App files → `doc/` / app project.
+- No unnecessary duplicates; root `Panijog.apk` and `logo/` are kept as working copies.
+
+## Validation
+- Website: 17 pages, html-validate 0 errors, console 0 errors, no horizontal overflow.
+- Admin: 15 pages, html-validate 0 errors, console 0 functional errors.
+- Unified rules: 3 locations, identical.
+
+
+## UI/UX notes (latest)
+- Theme toggle moved to the right side of the header (website + admin).
+- Toast notifications replaced with professional centered popup dialogs (admin panel).
+- Admin login page redesigned (centered card, focus rings, loading state).
+- Admin shell: sidebar flex column, aligned topbar/content, responsive tables.
